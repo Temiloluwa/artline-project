@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artline</title>
+</head>
+<body>
+    <style>
+        html {
+            font-size: 62.5%;
+        }
+
+        img {
+            max-width: 40rem;
+        }
+
+    </style>
+    <h1>Upload an Image</h1>
+    
+
+    <form action="http://localhost:5000" method="POST" enctype="multipart/form-data">
+        <input type="file"  id="query-image" name="query-image" accept="image/*" onchange="previewImage()">
+        <input type="submit" name="Upload Image"/>
+    </form>
+
+    <div>
+        <img id="qimg" src="{{q_image_path}}"/>
+    </div>
+
+    <div>
+        <img id="pimg" src="{{p_image_path}}">
+    </div>
+
+    {% block javascript %}
+        <script>
+            const previewImage = () => {
+                file = document.getElementById("query-image").files[0]
+                if (file) {
+                    qimg.src = URL.createObjectURL(file)
+                }
+            }
+        </script>
+    {% endblock %}
+</body>
+</html>
