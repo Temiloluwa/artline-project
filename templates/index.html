@@ -8,31 +8,98 @@
 </head>
 <body>
     <style>
+        * {
+        margin: 0;
+        padding: 0; 
+        
+        }
+
+        *,
+        *::before,
+        *::after {
+        box-sizing: inherit; 
+        }
+
         html {
-            font-size: 62.5%;
+        box-sizing: border-box;
+        font-size: 62.5%; 
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-color: aliceblue;
+        }
+
+        header {
+            text-align: center;
+            height: 10rem;
+            padding-top: 5rem;
+            margin-bottom: 10rem;
+            font-size: 2rem;
+        }
+
+        #app {
+            min-width: 136.6rem;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        
+        #form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        #form:first-child {
+            margin: 5rem;
+        }
+
+        #images {
+            display: flex;
+            justify-content: center;
         }
 
         img {
             max-width: 40rem;
         }
 
+
+
     </style>
-    <h1>Upload an Image</h1>
+    <div id="app">
+        <header>
+            <h1>Artline</h1>
+            <h3>Application is based on the repo @ <code>https://github.com/vijishmadhavan/ArtLine</code></h3>
+        </header>
+        <main>
+            <div id="form">
+                <form action="http://localhost:5000" method="POST" enctype="multipart/form-data">
+                    <input type="file"  id="query-image" name="query-image" accept="image/*" onchange="previewImage()">
+                    <input type="submit" value="Upload Image"/>
+                </form>
+
+                <form action="http://localhost:5000" method="POST">
+                    <input type="url" id="query-url" name="query-url" placeholder="Image URL">
+                    <input type="submit" value="Submit URL"/>
+                </form>
+            </div>
+        
+            <div id="images">
+                <div>
+                    <img id="qimg" src="{{q_image_path}}"/>
+                </div>
+        
+                <div>
+                    <img id="pimg" src="{{p_image_path}}">
+                </div>
+            </div>
+        </main>
+    </div>
     
-
-    <form action="http://localhost:5000" method="POST" enctype="multipart/form-data">
-        <input type="file"  id="query-image" name="query-image" accept="image/*" onchange="previewImage()">
-        <input type="submit" name="Upload Image"/>
-    </form>
-
-    <div>
-        <img id="qimg" src="{{q_image_path}}"/>
-    </div>
-
-    <div>
-        <img id="pimg" src="{{p_image_path}}">
-    </div>
-
+    
     {% block javascript %}
         <script>
             const previewImage = () => {
