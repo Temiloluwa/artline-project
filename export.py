@@ -4,9 +4,8 @@ from fastai.utils.mem import *
 from fastai.vision import load_learner
 from pathlib import Path
 from utils import *
-from app import app
-from flask import render_template, request
 from PIL import Image
+import torch
 
 class FeatureLoss(nn.Module):
     def __init__(self, m_feat, layer_ids, layer_wgts):
@@ -45,27 +44,14 @@ def predict(img_url, learner, url=False):
     pred = Image.fromarray(pred)
     return pred
 
+img_url = "static/images/woman.jpg"
+export = True
 learner = load_learner(Path("."), 'checkpoint/ArtLine_920.pkl')
+#prediction = predict(img_url, learner, url=False)
+#visualize_image(prediction)
+#img = preprocess_image(img_url, url=False)
+if export:
+    dummy_inp = torch.randn([1,3, 3091, 2227])
+    torch.jit.save(torch.jit.trace(learner.model, dummy_inp), 'artline.pt')
+print("")
 
-@app.route("/", methods=['GET', 'POST'])
-def predict_image():
-    if request.method == "POST":
-        if 'query-image' not in request.files:
-            return render_template('index.html', p_image_path=".", q_image_path="#")
-        
-        query_image = request.files['query-image']
-        query_path = os.path.join(app.config['UPLOAD_FOLDER'],\
-            query_image.filename)
-        query_image.save(query_path)
-        img = predict(query_path, learner, url=False)
-        pred_path = os.path.join(app.config['UPLOAD_FOLDER'], \
-            f"pred_{query_image.filename}")
-        img.save(pred_path)
-        return render_template('index.html',\
-         p_image_path=pred_path, q_image_path=query_path)
-    else:
-        return render_template('index.html', p_image_path=".", q_image_path="#")
-
-    
-if __name__ == "__main__":
-    app.run(host='0.0.0.0')
