@@ -8,6 +8,7 @@ from fastai.vision import load_learner
 from pathlib import Path
 from utils import *
 from flask import Flask, render_template, request
+from flask_cors import CORS
 from PIL import Image
 
 
@@ -15,7 +16,8 @@ from PIL import Image
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join("static",\
                              'images')
-
+cors = CORS(app, resources={r"/": {"origins": "*"}})
+                             
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
