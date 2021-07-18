@@ -35,8 +35,8 @@ jobs:
         with:
           command: |
             docker stop model
-            docker image prune -a
             docker rm -f model
+            docker system prune
             docker pull temmie01/artline:${{github.sha}}
             docker run -d --name model -p 80:8080  temmie01/artline:${{github.sha}}
           host: ${{ secrets.SSH_HOST }}
