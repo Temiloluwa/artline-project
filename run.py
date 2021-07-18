@@ -70,8 +70,9 @@ def predict_image():
     pred_path = os.path.join(app.config['UPLOAD_FOLDER'], "pred_img.jpg")
     img.save(pred_path)
     query_path = os.path.join(app.config['UPLOAD_FOLDER'], "query_img.jpg")
-    return render_template('index.html',\
-        p_image_path=pred_path, q_image_path=query_path)
+    return "I will work soon"
+    #return render_template('index.html',\
+    #    p_image_path=pred_path, q_image_path=query_path)
    
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
