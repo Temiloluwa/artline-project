@@ -1,12 +1,23 @@
 import torchvision.transforms as T
+import os
+import sys
+import torch.nn as nn
 from fastai.vision import *
 from fastai.utils.mem import *
 from fastai.vision import load_learner
 from pathlib import Path
 from utils import *
-from app import app
-from flask import render_template, request
+from flask import Flask, render_template, request
 from PIL import Image
+
+
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = os.path.join("static",\
+                             'images')
+
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 class FeatureLoss(nn.Module):
     def __init__(self, m_feat, layer_ids, layer_wgts):
@@ -45,7 +56,8 @@ def predict(img_url, learner, url=False):
     pred = Image.fromarray(pred)
     return pred
 
-learner = load_learner(Path("."), 'checkpoint/ArtLine_920.pkl')
+setattr(sys.modules["__main__"], 'FeatureLoss',  FeatureLoss)
+learner = load_learner(Path("."), 'ArtLine_920.pkl')
 
 @app.route("/", methods=['GET', 'POST'])
 def predict_image():
