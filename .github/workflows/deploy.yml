@@ -28,7 +28,7 @@ jobs:
           context: "."
           file: dockerfile
           push: true
-          tags: temmie01/artline:${github.sha}}
+          tags: temmie01/artline:${{github.sha}}
 
       - name: Deploy-container
         uses: fifsky/ssh-action@master
@@ -36,8 +36,9 @@ jobs:
           command: |
             docker stop model
             docker rm -f model
-            docker pull temmie01/artline:${github.sha}}
-            docker run -d --name model -p 80:8080  temmie01/artline:${github.sha}}
+            docker system prune
+            docker pull temmie01/artline:${{github.sha}}
+            docker run -d --name model -p 80:8080  temmie01/artline:${{github.sha}}
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PK }}
