@@ -38,7 +38,7 @@ jobs:
             docker stop model
             docker rm -f model
             docker pull temmie01/artline:latest
-            docker run -d --name model -p 8080:8080  temmie01/artline:latest
+            docker run -d --name model -p 80:8080  temmie01/artline:latest
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PK }}
