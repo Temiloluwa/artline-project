@@ -47,8 +47,8 @@ class FeatureLoss(nn.Module):
     def __del__(self): self.hooks.remove()
 
 
-def predict(img_url, learner, url=False):
-    img = preprocess_image(img_url, url)
+def predict(img_url, learner):
+    img = preprocess_img(img_url)
     _,pred, _ = learner.predict(img)
     pred = pred.detach().cpu().numpy().transpose((1, 2, 0))
     pred = (pred - pred.min())/ (pred.max() - pred.min()) * 255
@@ -62,17 +62,13 @@ learner = load_learner(Path("."), 'ArtLine_920.pkl')
 @app.route("/", methods=['GET', 'POST'])
 def predict_image():
     if request.method == "POST":
-        if 'query-image' not in request.files:
+        if 'query-url' not in request.form:
             return render_template('index.html', p_image_path=".", q_image_path="#")
-        
-        query_image = request.files['query-image']
-        query_path = os.path.join(app.config['UPLOAD_FOLDER'],\
-            query_image.filename)
-        query_image.save(query_path)
-        img = predict(query_path, learner, url=False)
-        pred_path = os.path.join(app.config['UPLOAD_FOLDER'], \
-            f"pred_{query_image.filename}")
+        query_url = request.form['query-url']
+        img = predict(query_url, learner)
+        pred_path = os.path.join(app.config['UPLOAD_FOLDER'], "pred_img.jpg")
         img.save(pred_path)
+        query_path = os.path.join(app.config['UPLOAD_FOLDER'], "query_img.jpg")
         return render_template('index.html',\
          p_image_path=pred_path, q_image_path=query_path)
     else:
@@ -80,4 +76,4 @@ def predict_image():
 
     
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host="0.0.0.0")
