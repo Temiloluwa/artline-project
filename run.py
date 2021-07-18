@@ -64,6 +64,8 @@ learner = load_learner(Path("."), 'ArtLine_920.pkl')
 
 @app.route("/", methods=['GET', 'POST'])
 def predict_image():
+    return "It's going to work"
+    """
     if 'query-url' not in request.form:
         return render_template('index.html', p_image_path=".", q_image_path="#")
     query_url = request.form['query-url']
@@ -73,6 +75,7 @@ def predict_image():
     query_path = os.path.join(app.config['UPLOAD_FOLDER'], "query_img.jpg")
     return render_template('index.html',\
         p_image_path=pred_path, q_image_path=query_path)
+    """
    
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
