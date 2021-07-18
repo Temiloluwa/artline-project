@@ -1,23 +1,11 @@
 import torchvision.transforms as T
-import os
-import sys
-import torch.nn as nn
 from fastai.vision import *
 from fastai.utils.mem import *
 from fastai.vision import load_learner
 from pathlib import Path
 from utils import *
-from flask import Flask, render_template, request
 from PIL import Image
-
-
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = os.path.join("static",\
-                             'images')
-
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+import torch
 
 class FeatureLoss(nn.Module):
     def __init__(self, m_feat, layer_ids, layer_wgts):
@@ -47,8 +35,8 @@ class FeatureLoss(nn.Module):
     def __del__(self): self.hooks.remove()
 
 
-def predict(img_url, learner):
-    img = preprocess_img(img_url)
+def predict(img_url, learner, url=False):
+    img = preprocess_image(img_url, url)
     _,pred, _ = learner.predict(img)
     pred = pred.detach().cpu().numpy().transpose((1, 2, 0))
     pred = (pred - pred.min())/ (pred.max() - pred.min()) * 255
@@ -56,24 +44,14 @@ def predict(img_url, learner):
     pred = Image.fromarray(pred)
     return pred
 
-setattr(sys.modules["__main__"], 'FeatureLoss',  FeatureLoss)
-learner = load_learner(Path("."), 'ArtLine_920.pkl')
+img_url = "static/images/woman.jpg"
+export = True
+learner = load_learner(Path("."), 'checkpoint/ArtLine_920.pkl')
+#prediction = predict(img_url, learner, url=False)
+#visualize_image(prediction)
+#img = preprocess_image(img_url, url=False)
+if export:
+    dummy_inp = torch.randn([1,3, 3091, 2227])
+    torch.jit.save(torch.jit.trace(learner.model, dummy_inp), 'artline.pt')
+print("")
 
-@app.route("/", methods=['GET', 'POST'])
-def predict_image():
-    if request.method == "POST":
-        if 'query-url' not in request.form:
-            return render_template('index.html', p_image_path=".", q_image_path="#")
-        query_url = request.form['query-url']
-        img = predict(query_url, learner)
-        pred_path = os.path.join(app.config['UPLOAD_FOLDER'], "pred_img.jpg")
-        img.save(pred_path)
-        query_path = os.path.join(app.config['UPLOAD_FOLDER'], "query_img.jpg")
-        return render_template('index.html',\
-         p_image_path=pred_path, q_image_path=query_path)
-    else:
-        return render_template('index.html', p_image_path=".", q_image_path="#")
-
-    
-if __name__ == "__main__":
-    app.run(host="0.0.0.0")

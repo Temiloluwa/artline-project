@@ -66,6 +66,26 @@
             max-width: 40rem;
         }
 
+        #save-img {
+            width: 10rem;
+            height: 4rem;
+            border-radius: 5%;
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #save-img a {
+            text-decoration: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        #submit {
+            cursor: pointer;
+        }
 
 
     </style>
@@ -73,17 +93,14 @@
         <header>
             <h1>Artline</h1>
             <h3>Application is based on the repo @ <code>https://github.com/vijishmadhavan/ArtLine</code></h3>
+            <h4>Upload Image or Supply Image URL</h4>
         </header>
         <main>
             <div id="form">
-                <form action="http://localhost:5000" method="POST" enctype="multipart/form-data">
+                <form action="http://localhost:8080" method="POST">
                     <input type="file"  id="query-image" name="query-image" accept="image/*" onchange="previewImage()">
-                    <input type="submit" value="Upload Image"/>
-                </form>
-
-                <form action="http://localhost:5000" method="POST">
-                    <input type="url" id="query-url" name="query-url" placeholder="Image URL">
-                    <input type="submit" value="Submit URL"/>
+                    <input type="url" id="query-url" name="query-url" placeholder="Image URL" onchange="previewImageURL()">
+                    <input id="submit" type="submit" value="Query Image"/>
                 </form>
             </div>
         
@@ -94,6 +111,9 @@
         
                 <div>
                     <img id="pimg" src="{{p_image_path}}">
+                    <div id="save-img">
+                        <a href="{{p_image_path}}" download>Save Image</a>
+                    </div>
                 </div>
             </div>
         </main>
@@ -106,8 +126,21 @@
                 file = document.getElementById("query-image").files[0]
                 if (file) {
                     qimg.src = URL.createObjectURL(file)
-                }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const imgPath = e.target.result
+                        console.log(imgPath);
+                        document.getElementById("query-url").value = imgPath
+                    }
+                    reader.readAsDataURL(file);
+                }     
             }
+            
+            const previewImageURL= () => {
+                url_value = document.getElementById("query-url").value
+                qimg.src = url_value
+            }
+
         </script>
     {% endblock %}
 </body>
