@@ -12,7 +12,6 @@ jobs:
     steps: 
       - name: checkout
         uses: actions/checkout@v2
-      - run: git checkout HEAD
 
       - name: Setup buildx
         uses: docker/setup-buildx-action@v1
@@ -29,7 +28,7 @@ jobs:
           context: "."
           file: dockerfile
           push: true
-          tags: temmie01/artline:latest
+          tags: temmie01/artline:${{GITHUB_SHA}}
 
       - name: Deploy-container
         uses: fifsky/ssh-action@master
@@ -37,8 +36,8 @@ jobs:
           command: |
             docker stop model
             docker rm -f model
-            docker pull temmie01/artline:latest
-            docker run -d --name model -p 80:8080  temmie01/artline:latest
+            docker pull temmie01/artline:${{GITHUB_SHA}}
+            docker run -d --name model -p 80:8080  temmie01/artline:${{GITHUB_SHA}}
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PK }}
