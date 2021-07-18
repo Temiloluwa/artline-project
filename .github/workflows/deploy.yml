@@ -41,4 +41,4 @@ jobs:
             docker run -d --name model -p 80:8080  temmie01/artline:${{github.sha}}
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PK }}d
+          key: ${{ secrets.SSH_PK }}
