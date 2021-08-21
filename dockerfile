@@ -8,10 +8,13 @@ RUN  apt-get update \
 WORKDIR /app
 COPY app/app.ini .
 
+
 RUN wget https://www.dropbox.com/s/04suaimdpru76h3/ArtLine_920.pkl?dl=1 
 RUN mv ArtLine_920.pkl?dl=1 ArtLine_920.pkl
 
 COPY . .
+
+RUN cp run.py uwsgi_file_run.py
 
 RUN pip install -r requirements.txt
 

@@ -34,10 +34,11 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            docker stop model
-            docker rm -f model
-            docker pull temmie01/artline:${{github.sha}}
-            docker run -d --name model -p 80:8080  temmie01/artline:${{github.sha}}
+            sudo docker stop model
+            sudo docker rm -f model
+            sudo docker pull temmie01/artline:${{github.sha}}
+            sudo docker run -d --name model -p 80:8080  temmie01/artline:${{github.sha}}
+            sudo docker exec -it  model sh -c "rq worker -u redis://20.52.2.137:6379"
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PK }}

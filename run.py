@@ -3,6 +3,7 @@ import torchvision.transforms as T
 import os
 import sys
 import torch.nn as nn
+import time
 from fastai.vision import *
 from fastai.utils.mem import *
 from fastai.vision import load_learner
@@ -11,13 +12,20 @@ from utils import *
 from flask import Flask, render_template, request
 from flask_cors import CORS
 from PIL import Image
-
+from rq import Queue
+from redis import Redis
 
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = os.path.join("static",\
-                             'images')
+
+app.config['UPLOAD_FOLDER'] = upload_folder = os.path.join("static", "images")
+pred_path = os.path.join(upload_folder, "pred_img.jpg")
+query_path = os.path.join(upload_folder, "query_img.jpg")
+
 cors = CORS(app, resources={r"/": {"origins": "*"}})
+
+r = Redis(host='20.52.2.137', port=6379, db=0)
+queue = Queue(connection=r)
                              
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -62,18 +70,45 @@ def predict(img_url, learner):
 setattr(sys.modules["__main__"], 'FeatureLoss',  FeatureLoss)
 learner = load_learner(Path("."), 'ArtLine_920.pkl')
 
-@app.route("/", methods=['GET', 'POST'])
-def predict_image():
-    if 'query-url' not in request.form:
-        return render_template('index.html', p_image_path=".", q_image_path="#")
-
-    query_url = request.form['query-url']
+def predict_img(query_url):
+    print("Received Image")
     img = predict(query_url, learner)
-    pred_path = os.path.join(app.config['UPLOAD_FOLDER'], "pred_img.jpg")
+    print("received prediction")
     img.save(pred_path)
-    query_path = os.path.join(app.config['UPLOAD_FOLDER'], "query_img.jpg")
-    return render_template('index.html',\
-        p_image_path=pred_path, q_image_path=query_path)
+
+
+def delete_imgs():
+    #time.sleep(10)
+    print("deleting images")
+    os.remove(pred_path)
+    os.remove(query_path)
+    print("images deleted")
+
+
+
+@app.route("/", methods=['GET', 'POST'])
+def add_prediction_task():
+    
+    if 'query-url' not in request.form:
+        if not os.path.exists(query_path) and not os.path.exists(pred_path):
+            return render_template('index.html', p_image_path=".", q_image_path="#")
+
+        elif os.path.exists(query_path) and not os.path.exists(pred_path):
+            return render_template('index.html', p_image_path=\
+                                    os.path.join(upload_folder,"still_process.jpeg"), q_image_path=query_path)
+        else:
+            #job = queue.enqueue(delete_imgs)
+            return render_template('index.html',\
+                p_image_path=pred_path, q_image_path=query_path)
+                
+    else:
+        if os.path.exists(query_path) and os.path.exists(pred_path):
+            delete_imgs()
+            job = queue.enqueue(predict_img, request.form['query-url'])
+            print(f"Job {job.id} added to queue  with {len(queue)} tasks in the queue")
+            return render_template('index.html', p_image_path=\
+                                    os.path.join(upload_folder, "img_process.png"), q_image_path=query_path)
+        
    
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
