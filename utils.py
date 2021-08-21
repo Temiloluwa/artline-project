@@ -31,6 +31,20 @@ def parse_base64(string_):
     else:
         return None
 
+
+def image_size(img, size=500):
+    """Resize Image and Maintain Aspect Ratio"""
+    w, h = img.size
+    aspect_ratio = w/h
+    new_height = round(size/aspect_ratio)
+    new_width = round(size * aspect_ratio)
+
+    if new_width < new_height:
+        return (new_width, size)
+    else:
+        return (size, new_height)
+
+
 def preprocess_img(img_url):
     bytes_str = parse_base64(img_url)
     if not bytes_str:
@@ -44,8 +58,10 @@ def preprocess_img(img_url):
             bytes_io = BytesIO(res.content)
     else:
         bytes_io = BytesIO(bytes_str)
+
         
     img = PIL.Image.open(bytes_io).convert("RGB")
+    img = img.resize(image_size(img))
     img_path = os.path.join("static/images", "query_img.jpg")
     img.save(img_path)
     img = add_margin(img, 250, 250, 250, 250, (255, 255, 255))

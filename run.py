@@ -100,14 +100,18 @@ def add_prediction_task():
             #job = queue.enqueue(delete_imgs)
             return render_template('index.html',\
                 p_image_path=pred_path, q_image_path=query_path)
-                
+
     else:
-        if os.path.exists(query_path) and os.path.exists(pred_path):
-            delete_imgs()
-            job = queue.enqueue(predict_img, request.form['query-url'])
-            print(f"Job {job.id} added to queue  with {len(queue)} tasks in the queue")
-            return render_template('index.html', p_image_path=\
-                                    os.path.join(upload_folder, "img_process.png"), q_image_path=query_path)
+        if os.path.exists(query_path):
+            os.remove(query_path)
+        
+        if os.path.exists(pred_path):
+            os.remove(pred_path)
+
+        job = queue.enqueue(predict_img, request.form['query-url'])
+        print(f"Job {job.id} added to queue  with {len(queue)} tasks in the queue")
+        return render_template('index.html', p_image_path=\
+                                os.path.join(upload_folder, "img_process.png"), q_image_path=query_path)
         
    
 if __name__ == "__main__":
