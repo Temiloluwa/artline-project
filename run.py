@@ -24,7 +24,7 @@ query_path = os.path.join(upload_folder, "query_img.jpg")
 
 cors = CORS(app, resources={r"/": {"origins": "*"}})
 
-r = Redis(host='20.52.2.137', port=6379, db=0)
+r = Redis(host='20.52.6.106', port=6379, db=0)
 queue = Queue(connection=r)
                              
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -116,3 +116,4 @@ def add_prediction_task():
    
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
+   
