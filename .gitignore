@@ -3,3 +3,5 @@ artline-env/
 __pycache__/
 checkpoint/
 *.pkl
+*.pyc
+*.json
