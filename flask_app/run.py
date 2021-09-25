@@ -18,7 +18,7 @@ def add_prediction_task():
         res = celery_app.send_task('tasks.predict_img', kwargs={"query_url": query_url})
         flask_app.logger.info(f"add task {res.backend}")
         response = {"task_id": res.id}
-        return render_template('index.html', p_image_path=".", q_image_path="#", task_id=res.id)
+        return render_template('index.html', p_image_path=".", q_image_path=query_url, task_id=res.id)
 
 
 @flask_app.route("/<task_id>")

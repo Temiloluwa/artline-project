@@ -22,12 +22,12 @@ def predict_img(self, query_url):
     self.update_state(state="PROGRESS", meta={'status': 200, 'msg':20})
     img = preprocess_img(query_url, req_id)
     
-    self.update_state(state="PROGRESS", meta={'status': 200, 'msg':40})
+    self.update_state(state="PROGRESS", meta={'status': 200, 'msg':50})
     _,pred, _ = learner.predict(img)
     
     self.update_state(state="PROGRESS", meta={'status': 200, 'msg':60})
     pred = process_pred(pred)
     logger.info("received prediction")
-    self.update_state(state="PROGRESS", meta={'status': 200, 'msg':90})
+    self.update_state(state="PROGRESS", meta={'status': 200, 'msg':100})
     
     return pred.decode('utf-8')

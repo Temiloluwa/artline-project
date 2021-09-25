@@ -87,6 +87,11 @@
             cursor: pointer;
         }
 
+        #query_status {
+            text-align: center;
+            font-size: 3rem;
+        }
+
 
     </style>
     <div id="app">
@@ -118,15 +123,15 @@
             </div>
 
             <p id="query_status">
-            <input id="task_id" type="text" style="display: inline;" value="{{task_id}}"/>
             </p>
+            <input id="task_id" type="text" style="display: none;" value="{{task_id}}"/>
         </main>
     </div>
     
     
     {% block javascript %}
         <script>
-            let result = {"status":0, "msg":0};
+            let predRetrievedResult = {"msg":0};
             
             const previewImage = () => {
                 file = document.getElementById("query-image").files[0]
@@ -135,7 +140,6 @@
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const imgPath = e.target.result
-                        console.log(imgPath);
                         document.getElementById("query-url").value = imgPath
                     }
                     reader.readAsDataURL(file);
@@ -143,61 +147,77 @@
             }
             
             const previewImageURL= () => {
-                url_value = document.getElementById("query-url").value
-                qimg.src = url_value
+                qimg.src = document.getElementById("query-url").value;
             }
             
-            const predString = (result, task_id) => {
-               const status = result["status"]
-               console.log(`status: ${status}`)
-               if (status < 50) {
-                   return "static/images/img_process.png"
-               }else if (status > 50 && status < 100) {
-                  return "static/images/still_process.png"
-               }else if (status == 100)
-                  result = getResult(task_id, true)
-                  return result['msg']
-            }
-    
-
-            const getResult = (task_id, result) => {
-                let getUrl = result ? `/result/${task_id}`: `/${task_id}`;
-
-                fetch(getUrl)
+            const getStatusResult = (task_id) => {
+                fetch(`/${task_id}`)
                     .then(
                         function(res){
                             if (res.status == 200){
                                 res.json().then((data) => {
-                                    document.getElementById("query_status").innerHTML = data["msg"]
-                                    console.log(data);
-                                    result = data
+                                    predRetrievedResult = data
                                 })
                                 
                             }
                         } 
                 ).catch(
                     function(err){
-                        result = {"status": 404, "msg":`Error ${err} occured. Please refresh page`}
+                        return {"status": 404, "msg":`Error ${err} occured. Please refresh page`}
                         
                     }
                 )
-                return result
             }
-            const task_id = document.getElementById("task_id").value
-            
+
+            const getPredResult = (task_id) => {
+                fetch(`/result/${task_id}`)
+                    .then(
+                        function(res){
+                            if (res.status == 200){
+                                res.json().then((data) => {
+                                    pimg.src = data["msg"]
+                                })
+                                
+                            }
+                        } 
+                ).catch(
+                    function(err){
+                        return {"status": 404, "msg":`Error ${err} occured. Please refresh page`}
+                        
+                    }
+                )
+            }
+
+
+            const predString = (result, task_id) => {
+               const msg = result["msg"]
+               if (msg < 50) {
+                   return "static/images/img_process.png"
+               }else if (msg > 50 && msg < 100) {
+                  return "static/images/still_process.png"
+               }else if (msg == 100)
+                 return "prediction"
+            }
+    
+            const task_id = document.getElementById("task_id").value;
+            let result = "";
+
             if (task_id){
                 let i = 0
-                document.getElementById("query_status").innerHTML = "query_submited" 
-                const interval = 2000
-                let hearbeat = setInterval(
-                    (task_id) => { 
-
+                document.getElementById("query_status").innerHTML = "query submitted";
+                const interval = 2000;
+                let pString = "";
+                let heartbeat = setInterval(
+                    () => { 
                         console.log(`heartbeat ${i++}`);
-                        result = getResult(task_id, false);
-                        pimg.src = predString(result, task_id)
-                        
-                        if (result["status"] == 100 || i == 20){
-                            clearInterval(hearbeat)
+                        getStatusResult(task_id);
+                        document.getElementById("query_status").innerHTML = `${predRetrievedResult["msg"]}% Completed`
+                        pString = predString(predRetrievedResult, task_id);
+                        pimg.src = pString;
+            
+                        if (predRetrievedResult["msg"] == 100 || i == 30){
+                            getPredResult(task_id)
+                            clearInterval(heartbeat);
                         }
                     }, interval);
             }
