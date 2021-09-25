@@ -189,14 +189,12 @@
             }
 
 
-            const predString = (result, task_id) => {
-               const msg = result["msg"]
-               if (msg < 50) {
-                   return "static/images/img_process.png"
-               }else if (msg > 50 && msg < 100) {
-                  return "static/images/still_process.png"
-               }else if (msg == 100)
-                 return "prediction"
+            const predImgDisp = (result) => {
+               if (result["msg"] <= 50) {
+                  pimg.src  = "/static/img/img_process.png"
+               }else {
+                  pimg.src  = "/static/img/still_process.jpeg"
+               }
             }
     
             const task_id = document.getElementById("task_id").value;
@@ -212,8 +210,7 @@
                         console.log(`heartbeat ${i++}`);
                         getStatusResult(task_id);
                         document.getElementById("query_status").innerHTML = `${predRetrievedResult["msg"]}% Completed`
-                        pString = predString(predRetrievedResult, task_id);
-                        pimg.src = pString;
+                        predImgDisp(predRetrievedResult);
             
                         if (predRetrievedResult["msg"] == 100 || i == 30){
                             getPredResult(task_id)

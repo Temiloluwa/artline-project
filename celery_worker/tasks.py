@@ -8,7 +8,7 @@ from celery.utils.log import get_task_logger
 from model import FeatureLoss
 from utils import *
 
-REDIS_ADDR = 'redis://localhost:6379'
+REDIS_ADDR = 'redis://redis:6379/0'
 celery_app = Celery('tasks', broker=REDIS_ADDR, backend=REDIS_ADDR)
 logger = get_task_logger(__name__)          
 setattr(sys.modules["__main__"], 'FeatureLoss',  FeatureLoss)

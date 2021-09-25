@@ -1,9 +1,8 @@
-import re
 from celery import Celery
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 
-REDIS_ADDR = 'redis://localhost:6379'
+REDIS_ADDR = 'redis://redis:6379/0'
 flask_app = Flask(__name__)
 celery_app = Celery('celery_worker', broker=REDIS_ADDR, backend=REDIS_ADDR)
 cors = CORS(flask_app, resources={r"/": {"origins": "*"}})
