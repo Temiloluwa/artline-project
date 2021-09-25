@@ -1,6 +1,7 @@
 ## Artline Project
 
-An Image Processing app that deploys the model at <https://github.com/vijishmadhavan/ArtLine>
+An Image Processing app that deploys the model @ <https://github.com/vijishmadhavan/ArtLine>
 
-- Model is deployed using Flask on an Azure VM that's offline attimes due to cost savings
-- Images supplied as queries to the model are queued on the server using Redis and Redis queue (RQ)
+- Web app @ http://20.52.2.137
+- Web app is deployed using Flask on an Azure VM that's offline attimes due to cost savings
+- Model runs on Celery task queues using Redis

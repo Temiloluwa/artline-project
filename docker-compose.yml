@@ -1,12 +1,14 @@
 version: "3.3"
 services:
   celery_worker:
+    image: temmie01/artline-celery-worker
     build: ./celery_worker
     restart: always
     depends_on:
       - redis
 
   flask_app:
+    image: temmie01/artline-flask-app
     build: ./flask_app
     depends_on:
       - redis
