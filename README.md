@@ -7,7 +7,7 @@ An Artistic Image Generator app for the model @ <https://github.com/vijishmadhav
 ## Technlogy stack
 Model runs on celery task queues. It receives and returns an image to the web app as a base64 string.
 
-- Front-End Library: Boostrap
+- Front-End Library: Bootstrap
 - Web Server: UWSGI
 - Web Framework: Flask
 - Task Queue: Celery
