@@ -1,2 +1,3 @@
 #!/bin/bash
-docker-compose up;
+cd ~/artline-project;
+docker-compose up -d;
