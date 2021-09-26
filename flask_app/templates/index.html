@@ -212,7 +212,7 @@
                         document.getElementById("query_status").innerHTML = `${predRetrievedResult["msg"]}% Completed`
                         predImgDisp(predRetrievedResult);
             
-                        if (predRetrievedResult["msg"] == 100 || i == 30){
+                        if (predRetrievedResult["msg"] == 100 || i == 90){
                             getPredResult(task_id)
                             clearInterval(heartbeat);
                         }
